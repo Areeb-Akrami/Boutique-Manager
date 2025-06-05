@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Manager</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/bills.css">
+    <link rel="stylesheet" href="css/expenses.css">
+    <link rel="stylesheet" href="css/insights.css">
+    <link rel="stylesheet" href="css/salary.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/modal.css">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Initialize Supabase - Replace with your credentials -->
+    <script>
+        // Initialize Supabase client
+        const initSupabase = () => {
+            // Replace these values with your actual Supabase credentials
+            const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+            const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+            
+            return supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
+        };
+        
+        // Create the Supabase client instance
+        const supabase = initSupabase();
+    </script>
+</head>
+<body>
+    <!-- The rest of the HTML content remains the same as in index.html -->
+    <!-- Just copy the entire body content from index.html and paste it here -->
+</body>
+
+<!-- Include all JavaScript files in the correct order -->
+<script src="js/utils.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/bills.js"></script>
+<script src="js/dupattas.js"></script>
+<script src="js/salary.js"></script>
+<script src="js/expenses.js"></script>
+<script src="js/insights.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+    // Initialize Feather icons after the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        feather.replace();
+    });
+</script>
+</html>

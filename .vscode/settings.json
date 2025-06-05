@@ -1,0 +1,5 @@
+{
+    "zencoder.enableRepoIndexing": true,
+    "liveServer.settings.port": 5505,
+    "CodeGPT.apiKey": "CodeGPT Plus Beta"
+}

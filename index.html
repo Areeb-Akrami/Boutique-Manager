@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Manager</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/modern.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/bills.css">
+    <link rel="stylesheet" href="css/expenses.css">
+    <link rel="stylesheet" href="css/insights.css">
+    <link rel="stylesheet" href="css/salary.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/cyberpunk-bg.css">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+</head>
+<body>
+    <!-- Cyberpunk Video/Canvas Background -->
+    <video id="cyberpunk-bg-video" autoplay loop muted playsinline poster="" style="display:block;">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-neon-lights-reflection-on-water-1250-large.mp4" type="video/mp4">
+      <!-- fallback: will be hidden if video loads -->
+    </video>
+    <canvas id="cyberpunk-bg-canvas"></canvas>
+    <div id="app">
+        <div class="auth-container" id="auth-container">
+            <div class="auth-box">
+                <div class="auth-header">
+                    <div class="logo-container">
+                        <i data-feather="shopping-bag" class="logo-icon gold"></i>
+                        <h1>Boutique Manager</h1>
+                    </div>
+                    <div class="auth-tabs">
+                        <button id="login-tab" class="auth-tab active">Login</button>
+                        <button id="signup-tab" class="auth-tab">Sign Up</button>
+                    </div>
+                </div>
+                
+                <!-- Login Form -->
+                <div class="auth-form" id="login-form">
+                    <div class="input-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" placeholder="Enter your email">
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="Enter your password">
+                    </div>
+                    <button id="login-btn" class="btn-primary">Sign In</button>
+                    <p class="auth-message" id="login-message"></p>
+                </div>
+                
+                <!-- Signup Form -->
+                <div class="auth-form" id="signup-form" style="display:none;">
+                    <div class="input-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" placeholder="Enter your email">
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" placeholder="Create a password">
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <input type="password" id="signup-confirm" placeholder="Confirm your password">
+                    </div>
+                    <button id="signup-btn" class="btn-primary">Create Account</button>
+                    <p class="auth-message" id="signup-message"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-container" id="main-container" style="display: none;">
+            <header>
+                <div class="logo-container">
+                    <i data-feather="shopping-bag" class="logo-icon gold"></i>
+                    <h1>Boutique Manager</h1>
+                </div>
+                <nav>
+                    <button id="customer-bills-btn" class="nav-btn" data-section="customer-bills">
+                        <i data-feather="file-text"></i> Customer Bills
+                    </button>
+                    <button id="dupatta-btn" class="nav-btn" data-section="dupatta">
+                        <i data-feather="package"></i> Dupatta
+                    </button>
+                    <button id="salary-btn" class="nav-btn" data-section="salary">
+                        <i data-feather="dollar-sign"></i> Salary
+                    </button>
+                    <button id="expense-btn" class="nav-btn" data-section="expense">
+                        <i data-feather="credit-card"></i> Expense
+                    </button>
+                    <button id="insights-btn" class="nav-btn" data-section="insights">
+                        <i data-feather="bar-chart-2"></i> Insights
+                    </button>
+                    <button id="settings-btn" class="nav-btn" data-section="settings">
+                        <i data-feather="settings"></i> Settings
+                    </button>
+                    <button id="logout-btn" class="nav-btn">
+                        <i data-feather="log-out"></i> Logout
+                    </button>
+                </nav>
+            </header>
+
+            <!-- Customer Bills Section -->
+            <section id="customer-bills-section" class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i data-feather="file-text"></i>
+                        <h2>Customer Bills</h2>
+                    </div>
+                    <div class="section-actions">
+                        <button id="multiple-bills-btn" class="btn-secondary">
+                            <i data-feather="layers"></i> Multiple Bills
+                        </button>
+                        <button id="new-bill-btn" class="btn-primary">
+                            <i data-feather="plus"></i> New Bill
+                        </button>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="search-filter">
+                        <div class="search-box">
+                            <input type="text" id="bill-search" placeholder="Search by bill no, customer...">
+                            <input type="date" id="bill-date-filter">
+                            <div class="filter-dropdown">
+                                <select id="bill-status-filter">
+                                    <option value="all">All Status</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="unpaid">Unpaid</option>
+                                    <option value="advance">Advance</option>
+                                </select>
+                            </div>
+                            <button id="bill-today-btn" class="btn-secondary small-btn">Today</button>
+                            <button id="bill-search-btn" class="search-btn">
+                                <i data-feather="search"></i> Search
+                            </button>
+                            <button id="bill-clear-btn" class="clear-btn">
+                                <i data-feather="x"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="bills-table">
+                            <thead>
+                                <tr>
+                                    <th>BILL NO.</th>
+                                    <th>CUSTOMER</th>
+                                    <th>PHONE</th>
+                                    <th>AMOUNT</th>
+                                    <th>DATE</th>
+                                    <th>DELIVERY DATE</th>
+                                    <th>STATUS</th>
+                                    <th>PAYMENT MODE</th>
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bills-table-body">
+                                <!-- Bills will be loaded here dynamically -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td colspan="6" class="total-row">
+                                        <span>Total Amount:</span>
+                                        <span id="bills-total-amount">₹0.00</span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dupatta Section -->
+            <section id="dupatta-section" class="section" style="display: none;">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i data-feather="package"></i>
+                        <h2>Dupatta</h2>
+                    </div>
+                    <div class="section-actions">
+                        <button id="new-dupatta-btn" class="btn-primary">
+                            <i data-feather="plus"></i> New Order
+                        </button>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="search-filter">
+                        <div class="search-box">
+                            <input type="text" id="dupatta-search" placeholder="Search by order no, customer...">
+                            <input type="date" id="dupatta-date-filter">
+                            <div class="filter-dropdown">
+                                <select id="dupatta-status-filter">
+                                    <option value="all">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <button id="dupatta-search-btn" class="search-btn">
+                                <i data-feather="search"></i> Search
+                            </button>
+                            <button id="dupatta-clear-btn" class="clear-btn">
+                                <i data-feather="x"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="dupatta-table">
+                            <thead>
+                                <tr>
+                                    <th>ORDER NO.</th>
+                                    <th>CUSTOMER</th>
+                                    <th>PHONE</th>
+                                    <th>AMOUNT</th>
+                                    <th>DATE</th>
+                                    <th>DELIVERY DATE</th>
+                                    <th>STATUS</th>
+                                    <th>PAYMENT MODE</th>
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dupatta-table-body">
+                                <!-- Dupatta orders will be loaded here dynamically -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td colspan="6" class="total-row">
+                                        <span>Total Amount:</span>
+                                        <span id="dupatta-total-amount">₹0.00</span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Salary Section -->
+            <section id="salary-section" class="section" style="display: none;">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i data-feather="dollar-sign"></i>
+                        <h2>Salary Management</h2>
+                    </div>
+                    <div class="section-actions">
+                        <button id="new-salary-btn" class="btn-primary">
+                            <i data-feather="plus"></i> New Salary Record
+                        </button>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="search-filter">
+                        <div class="search-box">
+                            <input type="text" id="salary-search" placeholder="Search by worker name...">
+                            <button id="salary-clear-btn" class="clear-btn">
+                                <i data-feather="x"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="salary-table">
+                            <thead>
+                                <tr>
+                                    <th>Worker Name</th>
+                                    <th>Total Salary Paid</th>
+                                    <th>Last Payment Date</th>
+                                    <th>Payment Totals</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salary-table-body">
+                                <!-- Salary records will be loaded here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expense Section -->
+            <section id="expense-section" class="section" style="display: none;">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i data-feather="credit-card"></i>
+                        <h2>Expense Management</h2>
+                    </div>
+                    <div class="section-actions">
+                        <button id="new-expense-btn" class="btn-primary">
+                            <i data-feather="plus"></i> New Expense
+                        </button>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="search-filter">
+                        <div class="search-box">
+                            <input type="text" id="expense-search" placeholder="Search by description...">
+                            <input type="date" id="expense-date-filter">
+                            <button id="expense-search-btn" class="search-btn">
+                                <i data-feather="search"></i> Search
+                            </button>
+                            <button id="expense-clear-btn" class="clear-btn">
+                                <i data-feather="x"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="expense-table">
+                            <thead>
+                                <tr>
+                                    <th>DESCRIPTION</th>
+                                    <th>AMOUNT</th>
+                                    <th>DATE</th>
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expense-table-body">
+                                <!-- Expenses will be loaded here dynamically -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td class="total-row">
+                                        <span>Total Amount:</span>
+                                    </td>
+                                    <td colspan="3" class="total-row">
+                                        <span id="expense-total-amount">₹0.00</span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Insights Section -->
+            <section id="insights-section" class="section" style="display: none;">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i data-feather="bar-chart-2"></i>
+                        <h2>Business Insights</h2>
+                    </div>
+                    <div class="section-actions">
+                        <div class="dropdown" id="export-insights-dropdown">
+                            <button class="btn-secondary dropdown-toggle" id="export-insights-btn">
+                                <i data-feather="download"></i> Export ▼
+                            </button>
+                            <div class="dropdown-menu" id="export-insights-menu">
+                                <button class="dropdown-item" id="export-insights-pdf"><i data-feather="file-text"></i> Download as PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="insights-view-controls">
+                        <button id="monthly-view-btn" class="btn-secondary active">Monthly View</button>
+                        <button id="yearly-view-btn" class="btn-secondary">Yearly View</button>
+                        <button id="custom-range-btn" class="btn-secondary">Custom Range</button>
+                        <div class="dropdown">
+                            <button id="current-period-btn" class="btn-secondary dropdown-toggle">Current <i data-feather="chevron-down"></i></button>
+                            <div class="dropdown-menu" id="period-dropdown"><!-- Will be populated dynamically --></div>
+                        </div>
+                        <button id="today-view-btn" class="btn-secondary">Today</button>
+                    </div>
+                    <div class="insights-period-grid">
+                        <div class="insights-card">
+                            <h3>Period Revenue</h3>
+                            <h2 id="period-revenue">₹0.00</h2>
+                            <div class="insights-details">
+                                <div class="insights-item">
+                                    <i data-feather="check-circle" class="gold"></i>
+                                    <span>Paid Bills:</span>
+                                    <span id="period-paid-bills">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="clock" class="gold"></i>
+                                    <span>Pending:</span>
+                                    <span id="period-pending-bills">₹0.00</span>
+                                </div>
+                            </div>
+                            <div class="insights-details">
+                                <h4>Payment Modes</h4>
+                                <div class="insights-item">
+                                    <i data-feather="credit-card" class="gold"></i>
+                                    <span>Cash:</span>
+                                    <span id="period-cash-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="smartphone" class="gold"></i>
+                                    <span>Google Pay:</span>
+                                    <span id="period-gpay-amount">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-card">
+                            <h3>Period Expenses</h3>
+                            <h2 id="period-expenses">₹0.00</h2>
+                            <div class="insights-details">
+                                <div class="insights-item">
+                                    <i data-feather="dollar-sign" class="gold"></i>
+                                    <span>Salary:</span>
+                                    <span id="period-salary-expense">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="credit-card" class="gold"></i>
+                                    <span>Other Expenses:</span>
+                                    <span id="period-other-expense">₹0.00</span>
+                                </div>
+                            </div>
+                            <div class="insights-details">
+                                <h4>Expense Payment Modes</h4>
+                                <div class="insights-item">
+                                    <i data-feather="credit-card" class="gold"></i>
+                                    <span>Cash:</span>
+                                    <span id="period-expense-cash">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="smartphone" class="gold"></i>
+                                    <span>Google Pay:</span>
+                                    <span id="period-expense-gpay">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-card profit-card">
+                            <h3>Period Profit</h3>
+                            <h2 id="period-profit">₹0.00</h2>
+                            <div class="insights-details">
+                                <div class="insights-item">
+                                    <i data-feather="trending-up" class="gold"></i>
+                                    <span>Total Revenue:</span>
+                                    <span id="period-total-revenue">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="trending-down" class="gold"></i>
+                                    <span>Total Expenses:</span>
+                                    <span id="period-total-expenses">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="percent" class="gold"></i>
+                                    <span>Profit Margin:</span>
+                                    <span id="period-profit-margin">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="insights-divider" />
+                    <div class="insights-grid">
+                        <div class="insights-card">
+                            <h3>Total Revenue</h3>
+                            <h2 id="total-revenue">₹0.00</h2>
+                            <div class="insights-details">
+                                <div class="insights-item">
+                                    <i data-feather="check-circle" class="gold"></i>
+                                    <span>Paid Bills:</span>
+                                    <span id="paid-bills-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="clock" class="gold"></i>
+                                    <span>Pending:</span>
+                                    <span id="pending-bills-amount">₹0.00</span>
+                                </div>
+                            </div>
+                            <div class="insights-details">
+                                <h4>Amount Breakdown</h4>
+                                <div class="insights-item">
+                                    <i data-feather="scissors" class="gold"></i>
+                                    <span>Stitching:</span>
+                                    <span id="stitching-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="package" class="gold"></i>
+                                    <span>Dupatta:</span>
+                                    <span id="dupatta-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="tool" class="gold"></i>
+                                    <span>Handwork:</span>
+                                    <span id="handwork-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="edit-3" class="gold"></i>
+                                    <span>Embroidery:</span>
+                                    <span id="embroidery-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="align-center" class="gold"></i>
+                                    <span>Hanging:</span>
+                                    <span id="hanging-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="square" class="gold"></i>
+                                    <span>Fabric:</span>
+                                    <span id="fabric-amount">₹0.00</span>
+                                </div>
+                            </div>
+                            <div class="insights-details">
+                                <h4>Payment Modes</h4>
+                                <div class="insights-item">
+                                    <i data-feather="credit-card" class="gold"></i>
+                                    <span>Cash:</span>
+                                    <span id="cash-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="smartphone" class="gold"></i>
+                                    <span>Google Pay:</span>
+                                    <span id="gpay-amount">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-card">
+                            <h3>Dupatta Revenue</h3>
+                            <h2 id="dupatta-revenue">₹0.00</h2>
+                            <div class="insights-details">
+                                <div class="insights-item">
+                                    <i data-feather="check-circle" class="gold"></i>
+                                    <span>Paid Orders:</span>
+                                    <span id="paid-orders-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="clock" class="gold"></i>
+                                    <span>Pending:</span>
+                                    <span id="pending-orders-amount">₹0.00</span>
+                                </div>
+                            </div>
+                            <div class="insights-details">
+                                <h4>Payment Modes</h4>
+                                <div class="insights-item">
+                                    <i data-feather="credit-card" class="gold"></i>
+                                    <span>Cash:</span>
+                                    <span id="dupatta-cash-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="smartphone" class="gold"></i>
+                                    <span>Google Pay:</span>
+                                    <span id="dupatta-gpay-amount">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-card">
+                            <h3>Total Expenses</h3>
+                            <h2 id="total-expenses">₹0.00</h2>
+                            <div class="insights-details">
+                                <div class="insights-item">
+                                    <i data-feather="dollar-sign" class="gold"></i>
+                                    <span>Salary:</span>
+                                    <span id="salary-expense-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="credit-card" class="gold"></i>
+                                    <span>Other Expenses:</span>
+                                    <span id="other-expense-amount">₹0.00</span>
+                                </div>
+                            </div>
+                            <div class="insights-details">
+                                <h4>Salary Payment Modes</h4>
+                                <div class="insights-item">
+                                    <i data-feather="credit-card" class="gold"></i>
+                                    <span>Cash:</span>
+                                    <span id="salary-cash-amount">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="smartphone" class="gold"></i>
+                                    <span>Google Pay:</span>
+                                    <span id="salary-gpay-amount">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-card profit-card">
+                            <h3>Net Profit</h3>
+                            <h2 id="net-profit">₹0.00</h2>
+                            <div class="insights-details">
+                                <div class="insights-item">
+                                    <i data-feather="trending-up" class="gold"></i>
+                                    <span>Total Revenue:</span>
+                                    <span id="total-revenue-summary">₹0.00</span>
+                                </div>
+                                <div class="insights-item">
+                                    <i data-feather="trending-down" class="gold"></i>
+                                    <span>Total Expenses:</span>
+                                    <span id="total-expenses-summary">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="section" style="display: none;">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i data-feather="settings"></i>
+                        <h2>Shop Settings</h2>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label for="shop-name">Shop Name</label>
+                            <input type="text" id="shop-name" placeholder="Enter your shop name">
+                        </div>
+                        <div class="form-group">
+                            <label for="shop-phone">Phone Number</label>
+                            <input type="text" id="shop-phone" placeholder="Enter your phone number">
+                        </div>
+                        <div class="form-group">
+                            <label for="shop-address">Shop Address</label>
+                            <textarea id="shop-address" placeholder="Enter your shop address"></textarea>
+                        </div>
+                        <button id="save-settings-btn" class="btn-primary">
+                            <i data-feather="save"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Invoice View Modal -->
+        <div id="invoice-modal" class="modal">
+            <div class="modal-content large-modal">
+                <div class="modal-header">
+                    <h2>Invoice</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div id="invoice-container" class="invoice-container">
+                        <!-- Invoice will be generated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="print-invoice-btn" class="btn-primary">
+                        <i data-feather="printer"></i> Print Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Bill Modal -->
+        <div id="new-bill-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i data-feather="file-text"></i> New Bill</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="new-bill-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bill-number">Bill No.</label>
+                                <input type="text" id="bill-number" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bill-customer-name">Customer Name</label>
+                                <input type="text" id="bill-customer-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="bill-customer-phone">Phone</label>
+                                <input type="text" id="bill-customer-phone">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bill-date">Bill Date</label>
+                                <input type="date" id="bill-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bill-delivery-date">Delivery Date</label>
+                                <input type="date" id="bill-delivery-date" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bill-payment-status">Payment Status</label>
+                                <select id="bill-payment-status" required>
+                                    <option value="unpaid">Unpaid</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="advance">Advance</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="bill-payment-mode">Payment Mode</label>
+                                <select id="bill-payment-mode" required>
+                                    <option value="cash">Cash</option>
+                                    <option value="gpay">Google Pay</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="services-container">
+                            <h3>Services</h3>
+                            <div class="services-table">
+                                <table id="bill-services-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Service</th>
+                                            <th>Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bill-services-body">
+                                        <tr>
+                                            <td>
+                                                <select class="service-type" required>
+                                                    <option value="">Select Service</option>
+                                                    <option value="stitching">Stitching</option>
+                                                    <option value="dupatta">Dupatta</option>
+                                                    <option value="handwork">Handwork</option>
+                                                    <option value="embroidery">Embroidery</option>
+                                                    <option value="hanging">Hanging</option>
+                                                    <option value="fabric">Fabric</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="service-amount" min="0" step="0.01" required>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn-icon remove-service">
+                                                    <i data-feather="trash-2"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <button type="button" id="add-service-btn" class="btn-secondary">
+                                    <i data-feather="plus"></i> Add Service
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-row total-row">
+                            <h3>Total Amount:</h3>
+                            <h3 id="bill-total-amount">₹0.00</h3>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                    <button type="button" id="save-bill-btn" class="btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Bill Modal -->
+        <div id="edit-bill-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i data-feather="edit"></i> Edit Bill</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-bill-form">
+                        <input type="hidden" id="edit-bill-id">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-bill-number">Bill No.</label>
+                                <input type="text" id="edit-bill-number" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-bill-customer-name">Customer Name</label>
+                                <input type="text" id="edit-bill-customer-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-bill-customer-phone">Phone</label>
+                                <input type="text" id="edit-bill-customer-phone">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-bill-date">Bill Date</label>
+                                <input type="date" id="edit-bill-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-bill-delivery-date">Delivery Date</label>
+                                <input type="date" id="edit-bill-delivery-date" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-bill-payment-status">Payment Status</label>
+                                <select id="edit-bill-payment-status" required>
+                                    <option value="unpaid">Unpaid</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="advance">Advance</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-bill-payment-mode">Payment Mode</label>
+                                <select id="edit-bill-payment-mode" required>
+                                    <option value="cash">Cash</option>
+                                    <option value="gpay">Google Pay</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="services-container">
+                            <h3>Services</h3>
+                            <div class="services-table">
+                                <table id="edit-bill-services-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Service</th>
+                                            <th>Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="edit-bill-services-body">
+                                        <!-- Services will be loaded here dynamically -->
+                                    </tbody>
+                                </table>
+                                <button type="button" id="edit-add-service-btn" class="btn-secondary">
+                                    <i data-feather="plus"></i> Add Service
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-row total-row">
+                            <h3>Total Amount:</h3>
+                            <h3 id="edit-bill-total-amount">₹0.00</h3>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                    <button type="button" id="update-bill-btn" class="btn-primary">Update</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Salary Record Modal -->
+        <div id="new-salary-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i data-feather="dollar-sign"></i> New Salary Record</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="new-salary-form">
+                        <div class="form-group">
+                            <label for="worker-name">Worker Name</label>
+                            <input type="text" id="worker-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="salary-amount">Amount</label>
+                            <input type="number" id="salary-amount" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="salary-date">Date</label>
+                            <input type="date" id="salary-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="salary-payment-mode">Payment Mode</label>
+                            <select id="salary-payment-mode" required>
+                                <option value="">Select Payment Mode</option>
+                                <option value="cash">Cash</option>
+                                <option value="gpay">Google Pay</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                    <button type="button" id="save-salary-btn" class="btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Expense Modal -->
+        <div id="new-expense-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i data-feather="credit-card"></i> New Expense</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="new-expense-form">
+                        <div class="form-group">
+                            <label for="expense-description">Description</label>
+                            <input type="text" id="expense-description" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-amount">Amount</label>
+                            <input type="number" id="expense-amount" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-date">Date</label>
+                            <input type="date" id="expense-date" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                    <button type="button" id="save-expense-btn" class="btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multiple Bills Modal -->
+        <div id="multiple-bills-modal" class="modal">
+            <div class="modal-content large-modal">
+                <div class="modal-header">
+                    <h2><i data-feather="layers"></i> Multiple Bills</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="multiple-bills-container">
+                        <div class="multiple-bills-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="multi-bill-customer-name">Customer Name</label>
+                                    <input type="text" id="multi-bill-customer-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="multi-bill-customer-phone">Phone</label>
+                                    <input type="text" id="multi-bill-customer-phone">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="multi-bill-date">Bill Date</label>
+                                    <input type="date" id="multi-bill-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="multi-bill-delivery-date">Delivery Date</label>
+                                    <input type="date" id="multi-bill-delivery-date" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="multiple-bills-list">
+                            <h3>Bills List</h3>
+                            <div class="bills-list-container">
+                                <div class="bill-card">
+                                    <div class="bill-card-header">
+                                        <h3>Bill #1</h3>
+                                        <button type="button" class="btn-icon remove-bill">
+                                            <i data-feather="trash-2"></i>
+                                        </button>
+                                    </div>
+                                    <div class="bill-card-content">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>Bill Number</label>
+                                                <input type="text" class="multi-bill-number" placeholder="e.g. EB-2025-001" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>Payment Status</label>
+                                                <select class="multi-bill-payment-status" required>
+                                                    <option value="unpaid">Unpaid</option>
+                                                    <option value="paid">Paid</option>
+                                                    <option value="advance">Advance</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Payment Mode</label>
+                                                <select class="multi-bill-payment-mode" required>
+                                                    <option value="cash">Cash</option>
+                                                    <option value="gpay">Google Pay</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="services-container">
+                                            <h4>Services</h4>
+                                            <div class="services-table">
+                                                <table class="multi-bill-services-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Service</th>
+                                                            <th>Amount</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="multi-bill-services-body">
+                                                        <tr>
+                                                            <td>
+                                                                <select class="service-type" required>
+                                                                    <option value="">Select Service</option>
+                                                                    <option value="stitching">Stitching</option>
+                                                                    <option value="dupatta">Dupatta</option>
+                                                                    <option value="handwork">Handwork</option>
+                                                                    <option value="embroidery">Embroidery</option>
+                                                                    <option value="hanging">Hanging</option>
+                                                                    <option value="fabric">Fabric</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" class="service-amount" min="0" step="0.01" required>
+                                                            </td>
+                                                            <td>
+                                                                <button type="button" class="btn-icon remove-service">
+                                                                    <i data-feather="trash-2"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <button type="button" class="btn-secondary add-multi-service-btn">
+                                                    <i data-feather="plus"></i> Add Service
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="form-row total-row">
+                                            <h4>Total Amount:</h4>
+                                            <h4 class="multi-bill-total-amount">₹0.00</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" id="add-bill-btn" class="btn-secondary">
+                                <i data-feather="plus"></i> Add Bill
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                    <button type="button" id="save-multiple-bills-btn" class="btn-primary">Save All Bills</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Range Modal -->
+        <div id="date-range-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i data-feather="calendar"></i> Custom Date Range</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="date-range-form">
+                        <div class="form-group">
+                            <label for="range-start-date">Start Date</label>
+                            <input type="date" id="range-start-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="range-end-date">End Date</label>
+                            <input type="date" id="range-end-date" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                    <button type="button" id="apply-date-range-btn" class="btn-primary">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-confirm-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i data-feather="alert-triangle"></i> Confirm Delete</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <p id="delete-confirm-message">Are you sure you want to delete this item?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                    <button type="button" id="confirm-delete-btn" class="btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dupatta Modals -->
+    <!-- New Dupatta Modal -->
+    <div id="new-dupatta-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Dupatta Order</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="new-dupatta-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dupatta-order-number">Order Number</label>
+                            <input type="text" id="dupatta-order-number" placeholder="e.g. D-2025-001" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dupatta-customer-name">Customer Name (optional)</label>
+                            <input type="text" id="dupatta-customer-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="dupatta-customer-phone">Phone (optional)</label>
+                            <input type="text" id="dupatta-customer-phone">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dupatta-order-date">Order Date</label>
+                            <input type="date" id="dupatta-order-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dupatta-delivery-date">Delivery Date</label>
+                            <input type="date" id="dupatta-delivery-date" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dupatta-status">Status</label>
+                            <select id="dupatta-status" required>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dupatta-payment-mode">Payment Mode</label>
+                            <select id="dupatta-payment-mode" required>
+                                <option value="cash">Cash</option>
+                                <option value="gpay">Google Pay</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dupatta-amount">Amount (₹)</label>
+                            <input type="number" id="dupatta-amount" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="dupatta-details">Details</label>
+                            <textarea id="dupatta-details" rows="3" placeholder="Enter dupatta details..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="close-modal-btn">Cancel</button>
+                        <button type="submit" class="btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Dupatta Modal -->
+    <div id="edit-dupatta-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Dupatta Order</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-dupatta-form">
+                    <input type="hidden" id="edit-dupatta-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-dupatta-order-number">Order Number</label>
+                            <input type="text" id="edit-dupatta-order-number" placeholder="e.g. D-2025-001" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-dupatta-customer-name">Customer Name (optional)</label>
+                            <input type="text" id="edit-dupatta-customer-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-dupatta-customer-phone">Phone (optional)</label>
+                            <input type="text" id="edit-dupatta-customer-phone">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-dupatta-order-date">Order Date</label>
+                            <input type="date" id="edit-dupatta-order-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-dupatta-delivery-date">Delivery Date</label>
+                            <input type="date" id="edit-dupatta-delivery-date" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-dupatta-status">Status</label>
+                            <select id="edit-dupatta-status" required>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-dupatta-payment-mode">Payment Mode</label>
+                            <select id="edit-dupatta-payment-mode" required>
+                                <option value="cash">Cash</option>
+                                <option value="gpay">Google Pay</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-dupatta-amount">Amount (₹)</label>
+                            <input type="number" id="edit-dupatta-amount" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="edit-dupatta-details">Details</label>
+                            <textarea id="edit-dupatta-details" rows="3" placeholder="Enter dupatta details..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="close-modal-btn">Cancel</button>
+                        <button type="submit" class="btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Dupatta Confirmation Modal -->
+    <div id="delete-dupatta-confirm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirm Delete</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="delete-dupatta-confirm-message">Are you sure you want to delete this dupatta order?</p>
+                <div class="form-actions">
+                    <button type="button" class="close-modal-btn">Cancel</button>
+                    <button type="button" id="delete-dupatta-confirm-btn" class="btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/supabase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/bills.js"></script>
+    <script src="js/expenses.js"></script>
+    <script src="js/salary.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/insights.js"></script>
+    <script src="js/dupattas.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+\n
+/* Print Styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #invoice-container, #invoice-container * {
+        visibility: visible;
+    }
+
+    #invoice-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 1cm; /* Add some padding for printing */
+        border: none;
+        box-shadow: none;
+        font-size: 10pt; /* Adjust font size for print */
+    }
+
+    /* Hide elements not needed for print */
+    .sidebar, 
+    .main-header, 
+    .content-header, 
+    .modal, 
+    .btn, 
+    #new-bill-btn, 
+    #multiple-bills-btn, 
+    #save-bill-btn, 
+    #update-bill-btn, 
+    #print-invoice-btn, 
+    #confirm-delete-btn, 
+    .action-buttons, 
+    .search-filter-container, 
+    .pagination-container,
+    .bill-card-actions,
+    .remove-service,
+    .remove-bill,
+    .add-multi-service-btn,
+    #add-service-btn,
+    #edit-add-service-btn,
+    #save-multiple-bills-btn,
+    #add-bill-btn,
+    #bill-search-btn,
+    #bill-clear-btn,
+    .close-btn {
+        display: none !important;
+    }
+
+    .invoice-table th,
+    .invoice-table td {
+        border: 1px solid #ccc; /* Add borders for clarity */
+        padding: 0.5rem;
+    }
+
+    .invoice-total-table .total-row td {
+        color: #000; /* Ensure total is black for printing */
+    }
+
+    .invoice-total-table .total-row td:last-child {
+        color: #000; /* Ensure total amount is black */
+    }
+
+    /* Ensure page breaks work correctly if needed */
+    .page-break {
+        page-break-before: always;
+    }
+}
