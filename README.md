@@ -15,6 +15,8 @@ A comprehensive boutique management system for handling bills, inventory, and cu
 
 [View Live Demo](https://areeb-akrami.github.io/Boutique-Manager/)
 
+> Last deployment: 2025-06-05 23:48 IST
+
 ## Getting Started
 
 ### Prerequisites
